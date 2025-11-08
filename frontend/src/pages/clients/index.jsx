@@ -52,7 +52,7 @@ export default function Clients() {
             });
 
             const clientsData = res.data;
-            const perPage = 4;
+            const perPage = 6;
             const start = (page - 1) * perPage;
             const paginated = clientsData.slice(start, start + perPage);
 
@@ -131,7 +131,19 @@ export default function Clients() {
     }, [page, search])
 
     return (
-        <Box sx={{ display: 'flex', height: '100vh', gap: 2, p: 3, backgroundColor: '#f9fafb' }}>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                height: 'calc(100vh - 128px)',
+                maxWidth: '1200px',
+                width: '100%',
+                gap: 3,
+                p: 3,
+                backgroundColor: '#f9fafb',
+                overflow: 'hidden',
+            }}
+        >
             <Paper sx={{ flex: 1, p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <Box sx={{ position: 'relative', mb: 2 }}>
                     <Avatar
@@ -227,74 +239,85 @@ export default function Clients() {
                     <>
                         <Box
                             sx={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
-                                gap: 2,
                                 flex: 1,
+                                overflowY: 'auto',
+                                maxHeight: 'calc(100vh - 250px)',
+                                p: 2,
                             }}
                         >
-                            {clients.map((client) => (
-                                <Paper
-                                    key={client.id}
-                                    elevation={2}
-                                    sx={{
-                                        p: 2,
-                                        display: 'flex',
-                                        flexDirection: 'column',
-                                        alignItems: 'center',
-                                        borderRadius: 3,
-                                        transition: '0.2s',
-                                        cursor: 'pointer',
-                                        '&:hover': {
-                                            boxShadow: 6,
-                                            transform: 'translateY(-3px)',
-                                        },
-                                    }}
-                                    onClick={() => navigate(`/contacts/${client.id}`)}
-                                >
-                                    <Avatar
-                                        src={`https://i.pravatar.cc/150?u=${client.email}`}
-                                        alt={client.name}
-                                        sx={{ width: 64, height: 64, mb: 1 }}
-                                    />
-                                    <Typography variant="subtitle1" fontWeight="bold" textAlign="center">
-                                        {client.name}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary" textAlign="center">
-                                        {client.email}
-                                    </Typography>
-                                    <Typography variant="body2" color="text.secondary">
-                                        📞 {client.phone}
-                                    </Typography>
-                                    <Typography variant="caption" color="text.disabled" mt={1}>
-                                        {new Date(client.createdAt).toLocaleDateString('pt-BR')}
-                                    </Typography>
+                            <Box
+                                sx={{
+                                    display: 'grid',
+                                    gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                                    gap: 2,
+                                }}
+                            >
+                                {clients.map((client) => (
+                                    <Paper
+                                        key={client.id}
+                                        elevation={2}
+                                        sx={{
+                                            p: 2,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            borderRadius: 3,
+                                            transition: '0.2s',
+                                            cursor: 'pointer',
+                                            maxHeight: 260,
+                                            overflow: 'hidden',
+                                            textOverflow: 'ellipsis',
+                                            '&:hover': {
+                                                boxShadow: 6,
+                                                transform: 'translateY(-3px)',
+                                            },
+                                        }}
+                                        onClick={() => navigate(`/contacts/${client.id}`)}
+                                    >
+                                        <Avatar
+                                            src={`https://i.pravatar.cc/150?u=${client.email}`}
+                                            alt={client.name}
+                                            sx={{ width: 64, height: 64, mb: 1 }}
+                                        />
+                                        <Typography variant="subtitle1" fontWeight="bold" textAlign="center">
+                                            {client.name}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" textAlign="center">
+                                            {client.email}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            📞 {client.phone}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.disabled" mt={1}>
+                                            {new Date(client.createdAt).toLocaleDateString('pt-BR')}
+                                        </Typography>
 
-                                    <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                                        <Button
-                                            size="small"
-                                            variant="outlined"
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleEdit(client)
-                                            }}
-                                        >
-                                            Editar
-                                        </Button>
-                                        <Button
-                                            size="small"
-                                            variant="contained"
-                                            color="error"
-                                            onClick={(e) => {
-                                                e.stopPropagation()
-                                                handleOpenDeleteModal(client)
-                                            }}
-                                        >
-                                            Excluir
-                                        </Button>
-                                    </Box>
-                                </Paper>
-                            ))}
+                                        <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                                            <Button
+                                                size="small"
+                                                variant="outlined"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleEdit(client);
+                                                }}
+                                            >
+                                                Editar
+                                            </Button>
+                                            <Button
+                                                size="small"
+                                                variant="contained"
+                                                color="error"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleOpenDeleteModal(client);
+                                                }}
+                                            >
+                                                Excluir
+                                            </Button>
+                                        </Box>
+                                    </Paper>
+                                ))}
+                            </Box>
                         </Box>
 
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
@@ -306,6 +329,7 @@ export default function Clients() {
                             />
                         </Box>
                     </>
+
                 )}
             </Paper>
 
@@ -324,6 +348,6 @@ export default function Clients() {
                     <Button color="error" onClick={handleConfirmDelete}>Excluir</Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+        </Box >
     )
 }

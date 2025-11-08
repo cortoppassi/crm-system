@@ -142,7 +142,21 @@ export default function Contacts() {
     }, [clientId, page, search])
 
     return (
-        <Box sx={{ display: 'flex', height: '100vh', gap: 2, p: 3, backgroundColor: '#f9fafb' }}>
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', md: 'row' },
+                alignItems: 'stretch',
+                justifyContent: 'stretch',
+                height: 'calc(100vh - 128px)',
+                maxWidth: '1200px',
+                width: '100%',
+                gap: 3,
+                p: 3,
+                backgroundColor: '#f9fafb',
+                overflow: 'hidden',
+            }}
+        >
             <Paper sx={{ flex: 1, p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {client && (
                     <>
@@ -176,18 +190,33 @@ export default function Contacts() {
                 ) : contacts.length === 0 ? (
                     <Typography textAlign="center" mt={5}>Nenhum contato encontrado.</Typography>
                 ) : (
-                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 2 }}>
-                        {contacts.map(c => (
-                            <Paper key={c.id} sx={{ p: 2, borderRadius: 3, textAlign: 'center', '&:hover': { boxShadow: 6 } }}>
-                                <Typography fontWeight="bold">{c.name}</Typography>
-                                <Typography color="text.secondary">{c.email}</Typography>
-                                <Typography color="text.secondary">📞 {c.phone}</Typography>
-                                <Box sx={{ display: 'flex', gap: 1, mt: 1, justifyContent: 'center' }}>
-                                    <Button size="small" variant="outlined" onClick={() => handleEditContact(c)}>Editar</Button>
-                                    <Button size="small" variant="contained" color="error" onClick={() => handleDeleteContact(c)}>Excluir</Button>
-                                </Box>
-                            </Paper>
-                        ))}
+                    <Box
+                        sx={{
+                            flex: 1,
+                            overflowY: 'auto',
+                            maxHeight: 'calc(100vh - 250px)',
+                            p: 2,
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                display: 'grid',
+                                gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+                                gap: 2,
+                            }}
+                        >
+                            {contacts.map(c => (
+                                <Paper key={c.id} sx={{ p: 2, borderRadius: 3, textAlign: 'center', '&:hover': { boxShadow: 6 } }}>
+                                    <Typography fontWeight="bold">{c.name}</Typography>
+                                    <Typography color="text.secondary">{c.email}</Typography>
+                                    <Typography color="text.secondary">📞 {c.phone}</Typography>
+                                    <Box sx={{ display: 'flex', gap: 1, mt: 1, justifyContent: 'center' }}>
+                                        <Button size="small" variant="outlined" onClick={() => handleEditContact(c)}>Editar</Button>
+                                        <Button size="small" variant="contained" color="error" onClick={() => handleDeleteContact(c)}>Excluir</Button>
+                                    </Box>
+                                </Paper>
+                            ))}
+                        </Box>
                     </Box>
                 )}
             </Paper>
