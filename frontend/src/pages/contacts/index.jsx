@@ -140,8 +140,15 @@ export default function Contacts() {
                 overflow: 'hidden',
             }}
         >
-            {/* Painel do cliente */}
-            <Paper sx={{ flex: 1, p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Paper
+                sx={{
+                    flex: 1,
+                    p: 3,
+                    display: { xs: 'none', md: 'flex' },
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
+            >
                 {client && (
                     <>
                         <Avatar src={`https://i.pravatar.cc/150?u=${client.email}`} alt={client.name} sx={{ width: 100, height: 100, mb: 2 }} />
@@ -153,9 +160,17 @@ export default function Contacts() {
                 )}
             </Paper>
 
-            {/* Lista de contatos */}
             <Paper sx={{ flex: 2, p: 3, display: 'flex', flexDirection: 'column' }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        justifyContent: 'space-between',
+                        alignItems: { xs: 'stretch', sm: 'center' },
+                        mb: 2,
+                        gap: 1,
+                    }}
+                >
                     <Typography variant="h6" fontWeight="bold">Contatos</Typography>
                     <Button variant="outlined" startIcon={<AddIcon />} onClick={handleOpenAddContact}>Adicionar Contato</Button>
                 </Box>

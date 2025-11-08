@@ -21,9 +21,12 @@ import {
     DialogContent,
     DialogContentText,
     DialogActions,
+    Snackbar,
+    Alert
 } from '@mui/material'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import SearchIcon from '@mui/icons-material/Search'
+import AddIcon from '@mui/icons-material/Add'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
@@ -39,6 +42,8 @@ export default function Clients() {
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const [clientToDelete, setClientToDelete] = useState(null)
     const navigate = useNavigate()
+    const [openClientModal, setOpenClientModal] = useState(false)
+    const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' })
 
     const fetchClients = async () => {
         setLoading(true);
@@ -81,6 +86,7 @@ export default function Clients() {
             setOpenDeleteModal(false);
             setClientToDelete(null);
             setLoading(false);
+            setSearch('');
         }
     };
 
@@ -89,33 +95,38 @@ export default function Clients() {
         setClientToDelete(null)
     }
 
-    const onSubmit = async (data) => {
+    const handleSubmitClient = async (data) => {
         try {
-            setLoading(true);
-
+            setLoading(true)
             if (editingClient) {
-                const res = await axios.put(`http://localhost:3000/clients/${editingClient.id}`, data);
-                const updatedClient = res.data;
-
-                setClients(clients.map(c => c.id === updatedClient.id ? updatedClient : c));
-                setEditingClient(null);
+                const res = await axios.put(`http://localhost:3000/clients/${editingClient.id}`, data)
+                setClients(clients.map(c => c.id === res.data.id ? res.data : c))
+                setSnack({ open: true, message: 'Cliente atualizado com sucesso!', severity: 'success' })
             } else {
-                // Criar novo cliente
-                const res = await axios.post('http://localhost:3000/clients', data);
-                const newClient = res.data;
-                setClients([...clients, newClient]);
+                const res = await axios.post('http://localhost:3000/clients', data)
+                setClients([...clients, res.data])
+                setSnack({ open: true, message: 'Cliente cadastrado com sucesso!', severity: 'success' })
             }
-
-            reset();
+            setOpenClientModal(false)
+            reset()
+            setEditingClient(null)
         } catch (err) {
-            console.error(err);
+            console.error(err)
+            setSnack({ open: true, message: 'Erro ao salvar cliente.', severity: 'error' })
         } finally {
-            setLoading(false);
+            setLoading(false)
         }
-    };
+    }
 
-    const handleEdit = (client) => {
+    const handleOpenAddClient = () => {
+        setEditingClient(null)
+        setOpenClientModal(true)
+        reset()
+    }
+
+    const handleOpenEditClient = (client) => {
         setEditingClient(client)
+        setOpenClientModal(true)
         setValue('name', client.name)
         setValue('email', client.email)
         setValue('phone', client.phone)
@@ -124,6 +135,17 @@ export default function Clients() {
     useEffect(() => {
         fetchClients()
     }, [page, search])
+
+    useEffect(() => {
+        if (editingClient) {
+            setValue('name', editingClient.name)
+            setValue('email', editingClient.email)
+            setValue('phone', editingClient.phone)
+        } else {
+            reset()
+        }
+    }, [editingClient, setValue, reset])
+
 
     return (
         <Box
@@ -139,7 +161,15 @@ export default function Clients() {
                 overflow: 'hidden',
             }}
         >
-            <Paper sx={{ flex: 1, p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <Paper
+                sx={{
+                    flex: 1,
+                    p: 3,
+                    display: { xs: 'none', md: 'flex' },
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                }}
+            >
                 <Box sx={{ position: 'relative', mb: 2 }}>
                     <Avatar
                         alt="Avatar padrão"
@@ -165,46 +195,26 @@ export default function Clients() {
                 <Typography variant="h5" textAlign="center" fontWeight="bold" mb={3}>
                     {editingClient ? 'Editar Cliente' : 'Cadastrar Cliente'}
                 </Typography>
-
-                <form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
-                    <TextField
-                        label={editingClient ? '' : 'Nome completo'}
-                        fullWidth
-                        margin="normal"
-                        {...register('name', { required: 'Nome é obrigatório' })}
-                        error={!!errors.name}
-                        helperText={errors?.name?.message}
-                    />
-
-                    <TextField
-                        label={editingClient ? '' : 'E-mail'}
-                        type="email"
-                        fullWidth
-                        margin="normal"
-                        {...register('email', { required: 'E-mail é obrigatório' })}
-                        error={!!errors.email}
-                        helperText={errors?.email?.message}
-                    />
-
-                    <TextField
-                        label={editingClient ? '' : 'Telefone'}
-                        fullWidth
-                        margin="normal"
-                        {...register('phone', { required: 'Telefone é obrigatório' })}
-                        error={!!errors.phone}
-                        helperText={errors?.phone?.message}
-                    />
-
-                    <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
-                        {editingClient ? 'Editar Cliente' : 'Cadastrar Cliente'}
-                    </Button>
-                </form>
             </Paper>
 
             <Paper sx={{ flex: 2, p: 3, display: 'flex', flexDirection: 'column' }}>
-                <Typography variant="h6" mb={2} fontWeight="bold">
-                    Lista de Clientes
-                </Typography>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        justifyContent: 'space-between',
+                        alignItems: { xs: 'stretch', sm: 'center' },
+                        mb: 2,
+                        gap: 1,
+                    }}
+                >
+                    <Typography variant="h6" fontWeight="bold">
+                        Lista de Clientes
+                    </Typography>
+                    <Button variant="outlined" startIcon={<AddIcon />} onClick={handleOpenAddClient}>
+                        Adicionar Cliente
+                    </Button>
+                </Box>
 
                 <TextField
                     placeholder="Buscar por nome ou e-mail"
@@ -293,7 +303,7 @@ export default function Clients() {
                                                 variant="outlined"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    handleEdit(client);
+                                                    handleOpenEditClient(client);
                                                 }}
                                             >
                                                 Editar
@@ -328,6 +338,42 @@ export default function Clients() {
                 )}
             </Paper>
 
+            <Dialog open={openClientModal} onClose={() => setOpenClientModal(false)}>
+                <DialogTitle>{editingClient ? 'Editar Cliente' : 'Adicionar Cliente'}</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        label="Nome completo"
+                        fullWidth
+                        margin="normal"
+                        {...register('name', { required: 'Nome é obrigatório' })}
+                        error={!!errors.name}
+                        helperText={errors?.name?.message}
+                    />
+                    <TextField
+                        label="E-mail"
+                        fullWidth
+                        margin="normal"
+                        {...register('email', { required: 'E-mail é obrigatório' })}
+                        error={!!errors.email}
+                        helperText={errors?.email?.message}
+                    />
+                    <TextField
+                        label="Telefone"
+                        fullWidth
+                        margin="normal"
+                        {...register('phone', { required: 'Telefone é obrigatório' })}
+                        error={!!errors.phone}
+                        helperText={errors?.phone?.message}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenClientModal(false)}>Cancelar</Button>
+                    <Button variant="contained" onClick={handleSubmit(handleSubmitClient)}>
+                        {editingClient ? 'Salvar' : 'Adicionar'}
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
             <Dialog
                 open={openDeleteModal}
                 onClose={handleCancelDelete}
@@ -342,7 +388,21 @@ export default function Clients() {
                     <Button onClick={handleCancelDelete}>Cancelar</Button>
                     <Button color="error" onClick={handleConfirmDelete}>Excluir</Button>
                 </DialogActions>
+
+
             </Dialog>
+
+            <Snackbar
+                open={snack.open}
+                autoHideDuration={4000}
+                onClose={() => setSnack({ ...snack, open: false })}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert severity={snack.severity} variant="filled" onClose={() => setSnack({ ...snack, open: false })}>
+                    {snack.message}
+                </Alert>
+            </Snackbar>
+
         </Box >
     )
 }
