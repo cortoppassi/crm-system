@@ -44,20 +44,15 @@ export default function Clients() {
         setLoading(true);
 
         try {
-            const res = await axios.get('http://localhost:3000/clients', {
+            const res = await axios.get('http://localhost:3000/clients/paginated', {
                 params: {
                     page,
                     search
                 }
             });
 
-            const clientsData = res.data;
-            const perPage = 6;
-            const start = (page - 1) * perPage;
-            const paginated = clientsData.slice(start, start + perPage);
-
-            setClients(paginated);
-            setTotalPages(Math.ceil(clientsData.length / perPage));
+            setClients(res.data.clients)
+            setTotalPages(res.data.totalPages)
         } catch (err) {
             console.error(err);
             setClients([]);

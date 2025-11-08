@@ -4,6 +4,7 @@ const ClientController = require('../controllers/client.controller.js');
 
 router.post('/', ClientController.create);
 router.get('/', ClientController.findAll);
+router.get('/paginated', ClientController.getAllClients);
 router.get('/:id', ClientController.findById);
 router.put('/:id', ClientController.update);
 router.delete('/:id', ClientController.delete);

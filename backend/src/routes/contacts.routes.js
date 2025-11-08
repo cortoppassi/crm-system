@@ -4,6 +4,7 @@ const ContactController = require('../controllers/contact.controller.js');
 
 router.post('/', ContactController.create);
 router.get('/', ContactController.findAll);
+router.get('/paginated', ContactController.getAllContacts)
 router.get('/:id', ContactController.findById);
 router.put('/:id', ContactController.update);
 router.delete('/:id', ContactController.delete);

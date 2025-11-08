@@ -5,6 +5,15 @@ module.exports = {
 
   getAllClients: async () => clientRepo.findAll(),
 
+  findAllPaginated: async (search, limit, offset) => {
+    try {
+      return await clientRepo.findAllPaginated(search, limit, offset)
+    } catch (error) {
+      console.error('Erro no ClientService.findAllPaginated:', error)
+      throw error
+    }
+  },
+
   getClientById: async (id) => {
     const client = clientRepo.findById(id);
     if (!client) throw new Error('Cliente não encontrado');
