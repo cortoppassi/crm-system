@@ -140,27 +140,67 @@ export default function Contacts() {
                 overflow: 'hidden',
             }}
         >
-            <Paper
+            <Box
                 sx={{
-                    flex: 1,
-                    p: 3,
-                    display: { xs: 'none', md: 'flex' },
+                    display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'center',
+                    flex: 1,
+                    gap: 2,
+                    minWidth: 0,        
                 }}
             >
-                {client && (
-                    <>
-                        <Avatar src={`https://i.pravatar.cc/150?u=${client.email}`} alt={client.name} sx={{ width: 100, height: 100, mb: 2 }} />
-                        <Typography variant="h6" fontWeight="bold">{client.name}</Typography>
-                        <Typography>{client.email}</Typography>
-                        <Typography>📞 {client.phone}</Typography>
-                        <Typography variant="caption" color="text.disabled">{new Date(client.createdAt).toLocaleDateString('pt-BR')}</Typography>
-                    </>
-                )}
-            </Paper>
+                <Paper
+                    sx={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: { xs: 'auto', md: 'calc(50% - 8px)' },
+                        p: 3,
+                    }}
+                >
+                    {client && (
+                        <>
+                            <Avatar
+                                src={`https://i.pravatar.cc/150?u=${client.email}`}
+                                alt={client.name}
+                                sx={{ width: 100, height: 100, mb: 2 }}
+                            />
+                            <Typography variant="h6" fontWeight="bold">{client.name}</Typography>
+                            <Typography>{client.email}</Typography>
+                            <Typography>📞 {client.phone}</Typography>
+                            <Typography variant="caption" color="text.disabled">
+                                {new Date(client.createdAt).toLocaleDateString('pt-BR')}
+                            </Typography>
+                        </>
+                    )}
+                </Paper>
 
-            <Paper sx={{ flex: 2, p: 3, display: 'flex', flexDirection: 'column' }}>
+                <Paper
+                    sx={{
+                        flex: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: { xs: 'auto', md: 'calc(50% - 8px)' },
+                        p: 3,
+                    }}
+                >
+                    <Typography>Gráfico / Métricas do Cliente</Typography>
+                </Paper>
+            </Box>
+
+            <Paper
+                sx={{
+                    flex: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    minWidth: 0,
+                    p: 3,
+                    overflow: 'hidden',
+                }}
+            >
                 <Box
                     sx={{
                         display: 'flex',

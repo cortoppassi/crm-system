@@ -30,8 +30,11 @@ import AddIcon from '@mui/icons-material/Add'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { useUser } from '../../UserContext';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Clients() {
+    const { user } = useUser();
     const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm()
     const [clients, setClients] = useState([])
     const [loading, setLoading] = useState(false)
@@ -44,6 +47,12 @@ export default function Clients() {
     const navigate = useNavigate()
     const [openClientModal, setOpenClientModal] = useState(false)
     const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' })
+
+    const data = [
+        { month: 'Jan', clients: 5 },
+        { month: 'Feb', clients: 12 },
+        { month: 'Mar', clients: 8 },
+    ];
 
     const fetchClients = async () => {
         setLoading(true);
@@ -161,41 +170,72 @@ export default function Clients() {
                 overflow: 'hidden',
             }}
         >
-            <Paper
+            <Box
                 sx={{
-                    flex: 1,
-                    p: 3,
-                    display: { xs: 'none', md: 'flex' },
+                    display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'center',
+                    flex: 1,
+                    gap: 2,
+                    minWidth: 0,
                 }}
             >
-                <Box sx={{ position: 'relative', mb: 2 }}>
-                    <Avatar
-                        alt="Avatar padrão"
-                        src="https://i.pravatar.cc/150?img=2"
-                        sx={{ width: 100, height: 100 }}
-                    />
-                    <IconButton
-                        size="small"
-                        sx={{
-                            position: 'absolute',
-                            bottom: 0,
-                            right: 0,
-                            bgcolor: 'white',
-                            border: '1px solid #ccc',
-                            '&:hover': { bgcolor: '#f0f0f0' },
-                        }}
-                    >
-                        <AddPhotoAlternateIcon fontSize="small" color="action" />
-                    </IconButton>
-                </Box>
+                <Paper
+                    sx={{
+                        flex: 1,
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: { xs: 'auto', md: 'calc(50% - 8px)' },
+                        p: 3,
+                    }}
+                >
+                    <Box sx={{ position: 'relative', mb: 2 }}>
+                        <Avatar
+                            alt="Avatar padrão"
+                            src="https://i.pravatar.cc/150?img=2"
+                            sx={{ width: 100, height: 100 }}
+                        />
+                        <IconButton
+                            size="small"
+                            sx={{
+                                position: 'absolute',
+                                bottom: 0,
+                                right: 0,
+                                bgcolor: 'white',
+                                border: '1px solid #ccc',
+                                '&:hover': { bgcolor: '#f0f0f0' },
+                            }}
+                        >
+                            <AddPhotoAlternateIcon fontSize="small" color="action" />
+                        </IconButton>
+                    </Box>
 
 
-                <Typography variant="h5" textAlign="center" fontWeight="bold" mb={3}>
-                    {editingClient ? 'Editar Cliente' : 'Cadastrar Cliente'}
-                </Typography>
-            </Paper>
+                    <Typography variant="h6" fontWeight="bold">
+                        {user?.user?.email}
+                    </Typography>
+                </Paper>
+                <Paper
+                    sx={{
+                        flex: 1,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: { xs: 'auto', md: 'calc(50% - 8px)' },
+                        p: 3,
+                    }}
+                >
+                    <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={data}>
+                            <XAxis dataKey="month" />
+                            <YAxis />
+                            <Tooltip />
+                            <Bar dataKey="clients" fill="#6a1b9a" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </Paper>
+            </Box>
 
             <Paper sx={{ flex: 2, p: 3, display: 'flex', flexDirection: 'column' }}>
                 <Box

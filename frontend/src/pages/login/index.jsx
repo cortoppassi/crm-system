@@ -3,11 +3,13 @@ import { Box, Button, TextField, Typography, Link, Paper, Snackbar, Alert } from
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { useUser } from '../../UserContext';
 
 export default function Login() {
     const [isRegister, setIsRegister] = useState(false)
     const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' })
     const navigate = useNavigate()
+    const { setUser } = useUser();
     const {
         register,
         handleSubmit,
@@ -34,6 +36,7 @@ export default function Login() {
                     password: data.password,
                 })
                 localStorage.setItem('token', res.data.token)
+                setUser(res.data);
                 setSnack({ open: true, message: 'Login realizado com sucesso!', severity: 'success' })
                 navigate('/clients')
             }
