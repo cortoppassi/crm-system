@@ -6,7 +6,6 @@ export default function Navbar() {
   const navigate = useNavigate()
   const location = useLocation()
 
-  // Evita exibir a seta se estiver na Home
   const showBackButton = location.pathname !== '/'
 
   return (

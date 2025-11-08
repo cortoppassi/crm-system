@@ -1,28 +1,33 @@
-const express = require('express');
-const cors = require('cors');
-const { routesController } = require('./src/routes/routes.js');
-const sequelize = require('./src/database'); // importa a conexão
-require('./src/models/client.model.js');
-require('./src/models/contact.model.js');
+const express = require('express')
+const cors = require('cors')
+const { routesController } = require('./src/routes/routes.js')
+const sequelize = require('./src/database')
 
-const app = express();
+require('./src/models/client.model.js')
+require('./src/models/contact.model.js')
+require('./src/models/user.model.js')
 
-app.use(cors());
-app.use(express.json());
-routesController(app);
+const authRoutes = require('./src/routes/auth.routes.js')
 
-const PORT = 3000;
+const app = express()
 
-// Sincroniza o SQLite e depois inicia o servidor
-sequelize.sync({ alter: true }) // alter:true atualiza tabela se houver mudanças no model
+app.use(cors())
+app.use(express.json())
+
+routesController(app)
+
+const PORT = 3000
+
+sequelize
+  .sync({ alter: true })
   .then(() => {
-    console.log('Banco SQLite sincronizado ✅');
+    console.log('Banco SQLite sincronizado ✅')
     app.listen(PORT, () => {
-      console.log(`Servidor rodando em http://localhost:${PORT} 🚀`);
-    });
+      console.log(`Servidor rodando em http://localhost:${PORT} 🚀`)
+    })
   })
   .catch(err => {
-    console.error('Erro ao sincronizar banco:', err);
-  });
+    console.error('Erro ao sincronizar banco:', err)
+  })
 
-module.exports = app;
+module.exports = app
