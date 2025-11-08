@@ -187,7 +187,7 @@ export default function Contacts() {
                         p: 3,
                     }}
                 >
-                    <Typography>Gráfico / Métricas do Cliente</Typography>
+                    <Typography>Gráfico / Métricas do Contato</Typography>
                 </Paper>
             </Box>
 
@@ -278,7 +278,6 @@ export default function Contacts() {
                 )}
             </Paper>
 
-            {/* Modal de adicionar/editar */}
             <Dialog open={openContactModal} onClose={() => setOpenContactModal(false)}>
                 <DialogTitle>{editingContact ? 'Editar Contato' : 'Adicionar Contato'}</DialogTitle>
                 <DialogContent>

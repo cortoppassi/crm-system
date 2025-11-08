@@ -22,7 +22,8 @@ import {
     DialogContentText,
     DialogActions,
     Snackbar,
-    Alert
+    Alert,
+    Tooltip,
 } from '@mui/material'
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate'
 import SearchIcon from '@mui/icons-material/Search'
@@ -31,7 +32,7 @@ import { useForm } from 'react-hook-form'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../../UserContext';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip as RechartsTooltip, ResponsiveContainer, Cell } from 'recharts';
 
 export default function Clients() {
     const { user } = useUser();
@@ -47,12 +48,8 @@ export default function Clients() {
     const navigate = useNavigate()
     const [openClientModal, setOpenClientModal] = useState(false)
     const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' })
-
-    const data = [
-        { month: 'Jan', clients: 5 },
-        { month: 'Feb', clients: 12 },
-        { month: 'Mar', clients: 8 },
-    ];
+    const [chartData, setChartData] = useState([]);
+    const colors = ['#6a1b9a', '#ff6f61', '#00b894', '#fdcb6e', '#0984e3', '#e17055'];
 
     const fetchClients = async () => {
         setLoading(true);
@@ -74,6 +71,26 @@ export default function Clients() {
         } finally {
             setLoading(false);
         }
+    };
+
+
+    const getClientsPerMonth = (clients) => {
+        const counts = {};
+
+        clients.forEach(client => {
+            const date = new Date(client.createdAt);
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+            const key = `${year}-${month.toString().padStart(2, '0')}`;
+
+            counts[key] = (counts[key] || 0) + 1;
+        });
+
+        const chartData = Object.entries(counts)
+            .map(([month, count]) => ({ month, count }))
+            .sort((a, b) => a.month.localeCompare(b.month));
+
+        return chartData;
     };
 
     const handleOpenDeleteModal = (client) => {
@@ -146,6 +163,11 @@ export default function Clients() {
     }, [page, search])
 
     useEffect(() => {
+        const data = getClientsPerMonth(clients);
+        setChartData(data);
+    }, [clients]);
+
+    useEffect(() => {
         if (editingClient) {
             setValue('name', editingClient.name)
             setValue('email', editingClient.email)
@@ -186,7 +208,7 @@ export default function Clients() {
                         flexDirection: 'column',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        minHeight: { xs: 'auto', md: 'calc(50% - 8px)' },
+                        minHeight: { xs: '100%', md: 'calc(50% - 8px)' },
                         p: 3,
                     }}
                 >
@@ -222,16 +244,20 @@ export default function Clients() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        minHeight: { xs: 'auto', md: 'calc(50% - 8px)' },
+                        minHeight: { xs: '100%', md: 'calc(50% - 8px)' },
                         p: 3,
                     }}
                 >
                     <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={data}>
+                        <BarChart data={chartData}>
                             <XAxis dataKey="month" />
                             <YAxis />
-                            <Tooltip />
-                            <Bar dataKey="clients" fill="#6a1b9a" />
+                            <RechartsTooltip />
+                            <Bar dataKey="count">
+                                {chartData.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+                                ))}
+                            </Bar>
                         </BarChart>
                     </ResponsiveContainer>
                 </Paper>
@@ -298,69 +324,76 @@ export default function Clients() {
                                 }}
                             >
                                 {clients.map((client) => (
-                                    <Paper
+                                    <Tooltip
                                         key={client.id}
-                                        elevation={2}
-                                        sx={{
-                                            p: 2,
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            alignItems: 'center',
-                                            borderRadius: 3,
-                                            transition: '0.2s',
-                                            cursor: 'pointer',
-                                            maxHeight: 260,
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis',
-                                            '&:hover': {
-                                                boxShadow: 6,
-                                                transform: 'translateY(-3px)',
-                                            },
-                                        }}
-                                        onClick={() => navigate(`/contacts/${client.id}`)}
+                                        title="Clique para visualizar os contatos deste cliente"
+                                        arrow
+                                        placement="top"
                                     >
-                                        <Avatar
-                                            src={`https://i.pravatar.cc/150?u=${client.email}`}
-                                            alt={client.name}
-                                            sx={{ width: 64, height: 64, mb: 1 }}
-                                        />
-                                        <Typography variant="subtitle1" fontWeight="bold" textAlign="center">
-                                            {client.name}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary" textAlign="center">
-                                            {client.email}
-                                        </Typography>
-                                        <Typography variant="body2" color="text.secondary">
-                                            📞 {client.phone}
-                                        </Typography>
-                                        <Typography variant="caption" color="text.disabled" mt={1}>
-                                            {new Date(client.createdAt).toLocaleDateString('pt-BR')}
-                                        </Typography>
+                                        <Paper
+                                            key={client.id}
+                                            elevation={2}
+                                            sx={{
+                                                p: 2,
+                                                display: 'flex',
+                                                flexDirection: 'column',
+                                                alignItems: 'center',
+                                                borderRadius: 3,
+                                                transition: '0.2s',
+                                                cursor: 'pointer',
+                                                maxHeight: 260,
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                '&:hover': {
+                                                    boxShadow: 6,
+                                                    transform: 'translateY(-3px)',
+                                                },
+                                            }}
+                                            onClick={() => navigate(`/contacts/${client.id}`)}
+                                        >
+                                            <Avatar
+                                                src={`https://i.pravatar.cc/150?u=${client.email}`}
+                                                alt={client.name}
+                                                sx={{ width: 64, height: 64, mb: 1 }}
+                                            />
+                                            <Typography variant="subtitle1" fontWeight="bold" textAlign="center">
+                                                {client.name}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary" textAlign="center">
+                                                {client.email}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                📞 {client.phone}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.disabled" mt={1}>
+                                                {new Date(client.createdAt).toLocaleDateString('pt-BR')}
+                                            </Typography>
 
-                                        <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
-                                            <Button
-                                                size="small"
-                                                variant="outlined"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleOpenEditClient(client);
-                                                }}
-                                            >
-                                                Editar
-                                            </Button>
-                                            <Button
-                                                size="small"
-                                                variant="contained"
-                                                color="error"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleOpenDeleteModal(client);
-                                                }}
-                                            >
-                                                Excluir
-                                            </Button>
-                                        </Box>
-                                    </Paper>
+                                            <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+                                                <Button
+                                                    size="small"
+                                                    variant="outlined"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleOpenEditClient(client);
+                                                    }}
+                                                >
+                                                    Editar
+                                                </Button>
+                                                <Button
+                                                    size="small"
+                                                    variant="contained"
+                                                    color="error"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleOpenDeleteModal(client);
+                                                    }}
+                                                >
+                                                    Excluir
+                                                </Button>
+                                            </Box>
+                                        </Paper>
+                                    </Tooltip>
                                 ))}
                             </Box>
                         </Box>
@@ -374,7 +407,6 @@ export default function Clients() {
                             />
                         </Box>
                     </>
-
                 )}
             </Paper>
 
