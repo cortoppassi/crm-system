@@ -40,69 +40,54 @@ export default function Clients() {
     const [clientToDelete, setClientToDelete] = useState(null)
     const navigate = useNavigate()
 
-    const MOCK_CLIENTS = [
-        { id: 1, nome: 'João Silva', email: 'joao@email.com', telefone: '11999990001', data_registro: '2025-10-01' },
-        { id: 2, nome: 'Maria Oliveira', email: 'maria@email.com', telefone: '11999990002', data_registro: '2025-10-02' },
-        { id: 3, nome: 'Carlos Santos', email: 'carlos@email.com', telefone: '11999990003', data_registro: '2025-10-03' },
-        { id: 4, nome: 'Ana Souza', email: 'ana@email.com', telefone: '11999990004', data_registro: '2025-10-04' },
-        { id: 5, nome: 'Paulo Lima', email: 'paulo@email.com', telefone: '11999990005', data_registro: '2025-10-05' },
-        { id: 6, nome: 'Fernanda Costa', email: 'fernanda@email.com', telefone: '11999990006', data_registro: '2025-10-06' },
-        { id: 7, nome: 'Bruno Rocha', email: 'bruno@email.com', telefone: '11999990007', data_registro: '2025-10-07' },
-        { id: 8, nome: 'Carla Mendes', email: 'carla@email.com', telefone: '11999990008', data_registro: '2025-10-08' },
-        { id: 9, nome: 'Eduardo Reis', email: 'eduardo@email.com', telefone: '11999990009', data_registro: '2025-10-09' },
-        { id: 10, nome: 'Juliana Martins', email: 'juliana@email.com', telefone: '11999990010', data_registro: '2025-10-10' },
-    ]
-
-    //   const fetchClients = async () => {
-    //     try {
-    //       setLoading(true)
-    //       const res = await axios.get(`http://localhost:3000/clients`, {
-    //         params: { page, search },
-    //       })
-    //       setClients(res.data.clients || [])
-    //       setTotalPages(res.data.totalPages || 1)
-    //     } catch (err) {
-    //       console.error(err)
-    //       setClients([])
-    //     } finally {
-    //       setLoading(false)
-    //     }
-    //   }
     const fetchClients = async () => {
-        setLoading(true)
+        setLoading(true);
 
-        setTimeout(() => {
-            let filtered = MOCK_CLIENTS
+        try {
+            const res = await axios.get('http://localhost:3000/clients', {
+                params: {
+                    page,
+                    search
+                }
+            });
 
-            if (search) {
-                filtered = filtered.filter((c) =>
-                    c.nome.toLowerCase().includes(search.toLowerCase()) ||
-                    c.email.toLowerCase().includes(search.toLowerCase())
-                )
-            }
+            const clientsData = res.data;
+            const perPage = 4;
+            const start = (page - 1) * perPage;
+            const paginated = clientsData.slice(start, start + perPage);
 
-            const perPage = 4
-            const start = (page - 1) * perPage
-            const paginated = filtered.slice(start, start + perPage)
-
-            setClients(paginated)
-            setTotalPages(Math.ceil(filtered.length / perPage))
-            setLoading(false)
-        }, 800)
-    }
+            setClients(paginated);
+            setTotalPages(Math.ceil(clientsData.length / perPage));
+        } catch (err) {
+            console.error(err);
+            setClients([]);
+            setTotalPages(1);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleOpenDeleteModal = (client) => {
         setClientToDelete(client)
         setOpenDeleteModal(true)
     }
 
-    const handleConfirmDelete = () => {
-        if (clientToDelete) {
-            setClients(clients.filter(c => c.id !== clientToDelete.id))
+    const handleConfirmDelete = async () => {
+        if (!clientToDelete) return;
+
+        try {
+            setLoading(true);
+            await axios.delete(`http://localhost:3000/clients/${clientToDelete.id}`);
+
+            setClients(clients.filter(c => c.id !== clientToDelete.id));
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setOpenDeleteModal(false);
+            setClientToDelete(null);
+            setLoading(false);
         }
-        setOpenDeleteModal(false)
-        setClientToDelete(null)
-    }
+    };
 
     const handleCancelDelete = () => {
         setOpenDeleteModal(false)
@@ -110,30 +95,35 @@ export default function Clients() {
     }
 
     const onSubmit = async (data) => {
-        if (editingClient) {
-            const updated = clients.map((c) =>
-                c.id === editingClient.id ? { ...c, ...data } : c
-            )
-            setClients(updated)
-            setEditingClient(null)
-        } else {
-            const newClient = {
-                id: Date.now(),
-                ...data,
-                data_registro: new Date().toISOString().split('T')[0],
+        try {
+            setLoading(true);
+
+            if (editingClient) {
+                const res = await axios.put(`http://localhost:3000/clients/${editingClient.id}`, data);
+                const updatedClient = res.data;
+
+                setClients(clients.map(c => c.id === updatedClient.id ? updatedClient : c));
+                setEditingClient(null);
+            } else {
+                // Criar novo cliente
+                const res = await axios.post('http://localhost:3000/clients', data);
+                const newClient = res.data;
+                setClients([...clients, newClient]);
             }
-            setClients([...clients, newClient])
+
+            reset();
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
-
-        reset()
-
-    }
+    };
 
     const handleEdit = (client) => {
         setEditingClient(client)
-        setValue('nome', client.nome)
+        setValue('name', client.name)
         setValue('email', client.email)
-        setValue('telefone', client.telefone)
+        setValue('phone', client.phone)
     }
 
     useEffect(() => {
@@ -174,9 +164,9 @@ export default function Clients() {
                         label={editingClient ? '' : 'Nome completo'}
                         fullWidth
                         margin="normal"
-                        {...register('nome', { required: 'Nome é obrigatório' })}
-                        error={!!errors.nome}
-                        helperText={errors?.nome?.message}
+                        {...register('name', { required: 'Nome é obrigatório' })}
+                        error={!!errors.name}
+                        helperText={errors?.name?.message}
                     />
 
                     <TextField
@@ -193,9 +183,9 @@ export default function Clients() {
                         label={editingClient ? '' : 'Telefone'}
                         fullWidth
                         margin="normal"
-                        {...register('telefone', { required: 'Telefone é obrigatório' })}
-                        error={!!errors.telefone}
-                        helperText={errors?.telefone?.message}
+                        {...register('phone', { required: 'Telefone é obrigatório' })}
+                        error={!!errors.phone}
+                        helperText={errors?.phone?.message}
                     />
 
                     <Button type="submit" variant="contained" fullWidth sx={{ mt: 2 }}>
@@ -264,20 +254,20 @@ export default function Clients() {
                                 >
                                     <Avatar
                                         src={`https://i.pravatar.cc/150?u=${client.email}`}
-                                        alt={client.nome}
+                                        alt={client.name}
                                         sx={{ width: 64, height: 64, mb: 1 }}
                                     />
                                     <Typography variant="subtitle1" fontWeight="bold" textAlign="center">
-                                        {client.nome}
+                                        {client.name}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary" textAlign="center">
                                         {client.email}
                                     </Typography>
                                     <Typography variant="body2" color="text.secondary">
-                                        📞 {client.telefone}
+                                        📞 {client.phone}
                                     </Typography>
                                     <Typography variant="caption" color="text.disabled" mt={1}>
-                                        {new Date(client.data_registro).toLocaleDateString('pt-BR')}
+                                        {new Date(client.createdAt).toLocaleDateString('pt-BR')}
                                     </Typography>
 
                                     <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
@@ -326,7 +316,7 @@ export default function Clients() {
                 <DialogTitle>Confirmar Exclusão</DialogTitle>
                 <DialogContent>
                     <DialogContentText>
-                        Tem certeza que deseja excluir o cliente "{clientToDelete?.nome}"?
+                        Tem certeza que deseja excluir o cliente "{clientToDelete?.name}"?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

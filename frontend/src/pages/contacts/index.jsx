@@ -20,6 +20,7 @@ import AddIcon from '@mui/icons-material/Add'
 import SearchIcon from '@mui/icons-material/Search'
 import { useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
+import axios from 'axios'
 
 export default function Contacts() {
     const { clientId } = useParams()
@@ -36,39 +37,21 @@ export default function Contacts() {
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const [contactToDelete, setContactToDelete] = useState(null)
 
-    const MOCK_CLIENTS = [
-        { id: 1, nome: 'João Silva', email: 'joao@email.com', telefone: '11999990001', data_registro: '2025-10-01' },
-        { id: 2, nome: 'Maria Oliveira', email: 'maria@email.com', telefone: '11999990002', data_registro: '2025-10-02' },
-    ]
-
-    const MOCK_CONTACTS = [
-        { id: 1, clientId: 1, nome: 'Contato A', email: 'a@contato.com', telefone: '11911110001' },
-        { id: 2, clientId: 1, nome: 'Contato B', email: 'b@contato.com', telefone: '11911110002' },
-    ]
-
-    useEffect(() => {
-        const c = MOCK_CLIENTS.find(c => c.id === Number(clientId))
-        setClient(c || null)
-        fetchContacts()
-    }, [clientId, page, search])
-
-    const fetchContacts = () => {
-        setLoading(true)
-        setTimeout(() => {
-            let filtered = MOCK_CONTACTS.filter(c => c.clientId === Number(clientId))
-            if (search) {
-                filtered = filtered.filter(c =>
-                    c.nome.toLowerCase().includes(search.toLowerCase()) ||
-                    c.email.toLowerCase().includes(search.toLowerCase())
-                )
-            }
-            const perPage = 4
-            const start = (page - 1) * perPage
-            setContacts(filtered.slice(start, start + perPage))
-            setTotalPages(Math.ceil(filtered.length / perPage))
-            setLoading(false)
-        }, 500)
-    }
+    const fetchContacts = async () => {
+        try {
+            setLoading(true);
+            const res = await axios.get('http://localhost:3000/contacts', {
+                params: { clientId }
+            });
+            setContacts(res.data.contacts);
+            setClient(res.data.client);
+        } catch (err) {
+            console.error(err);
+            setContacts([]);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleOpenAddContact = () => {
         setEditingContact(null)
@@ -79,9 +62,9 @@ export default function Contacts() {
     const handleEditContact = (contact) => {
         setEditingContact(contact)
         setOpenContactModal(true)
-        setValue('nome', contact.nome)
+        setValue('name', contact.name)
         setValue('email', contact.email)
-        setValue('telefone', contact.telefone)
+        setValue('phone', contact.phone)
     }
 
     const handleDeleteContact = (contact) => {
@@ -89,32 +72,85 @@ export default function Contacts() {
         setOpenDeleteModal(true)
     }
 
-    const confirmDeleteContact = () => {
-        setContacts(contacts.filter(c => c.id !== contactToDelete.id))
-        setOpenDeleteModal(false)
-        setContactToDelete(null)
-    }
+    const confirmDeleteContact = async () => {
+        if (!contactToDelete) return;
 
-    const onSubmitContact = (data) => {
-        if (editingContact) {
-            setContacts(contacts.map(c => c.id === editingContact.id ? { ...c, ...data } : c))
-        } else {
-            const newContact = { id: Date.now(), clientId: Number(clientId), ...data }
-            setContacts([...contacts, newContact])
+        try {
+            setLoading(true);
+
+            const res = await axios.delete(
+                `http://localhost:3000/contacts/${contactToDelete.id}`
+            );
+
+            if (res.status === 200) {
+                setContacts(contacts.filter(c => c.id !== contactToDelete.id));
+            } else {
+                alert('Erro ao excluir contato. Tente novamente.');
+            }
+
+        } catch (err) {
+            console.error('Erro ao excluir contato:', err);
+            alert('Erro ao excluir contato. Verifique o console.');
+        } finally {
+            setLoading(false);
+            setOpenDeleteModal(false);
+            setContactToDelete(null);
         }
-        setOpenContactModal(false)
-    }
+    };
+
+    const onSubmitContact = async (data) => {
+        try {
+            setLoading(true);
+
+            if (editingContact) {
+                const res = await axios.put(
+                    `http://localhost:3000/contacts/${editingContact.id}`,
+                    { ...data }
+                );
+                console.log(res);
+                if (res.status === 200) {
+                    setContacts(contacts.map(c =>
+                        c.id === editingContact.id ? res.data : c
+                    ));
+                }
+
+            } else {
+                const res = await axios.post(
+                    `http://localhost:3000/contacts`,
+                    { clientId: Number(clientId), ...data }
+                );
+
+                if (res.status === 201) {
+                    setContacts([...contacts, res.data]);
+                }
+            }
+
+            setOpenContactModal(false);
+            reset();
+            setEditingContact(null);
+
+        } catch (err) {
+            console.error("Erro ao salvar contato:", err);
+            alert("Erro ao salvar contato. Verifique o console.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchContacts()
+    }, [clientId, page, search])
 
     return (
         <Box sx={{ display: 'flex', height: '100vh', gap: 2, p: 3, backgroundColor: '#f9fafb' }}>
             <Paper sx={{ flex: 1, p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {client && (
                     <>
-                        <Avatar src={`https://i.pravatar.cc/150?u=${client.email}`} alt={client.nome} sx={{ width: 100, height: 100, mb: 2 }} />
-                        <Typography variant="h6" fontWeight="bold">{client.nome}</Typography>
+                        <Avatar src={`https://i.pravatar.cc/150?u=${client.email}`} alt={client.name} sx={{ width: 100, height: 100, mb: 2 }} />
+                        <Typography variant="h6" fontWeight="bold">{client.name}</Typography>
                         <Typography>{client.email}</Typography>
-                        <Typography>📞 {client.telefone}</Typography>
-                        <Typography variant="caption" color="text.disabled">{new Date(client.data_registro).toLocaleDateString('pt-BR')}</Typography>
+                        <Typography>📞 {client.phone}</Typography>
+                        <Typography variant="caption" color="text.disabled">{new Date(client.createdAt).toLocaleDateString('pt-BR')}</Typography>
                     </>
                 )}
             </Paper>
@@ -143,9 +179,9 @@ export default function Contacts() {
                     <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 2 }}>
                         {contacts.map(c => (
                             <Paper key={c.id} sx={{ p: 2, borderRadius: 3, textAlign: 'center', '&:hover': { boxShadow: 6 } }}>
-                                <Typography fontWeight="bold">{c.nome}</Typography>
+                                <Typography fontWeight="bold">{c.name}</Typography>
                                 <Typography color="text.secondary">{c.email}</Typography>
-                                <Typography color="text.secondary">📞 {c.telefone}</Typography>
+                                <Typography color="text.secondary">📞 {c.phone}</Typography>
                                 <Box sx={{ display: 'flex', gap: 1, mt: 1, justifyContent: 'center' }}>
                                     <Button size="small" variant="outlined" onClick={() => handleEditContact(c)}>Editar</Button>
                                     <Button size="small" variant="contained" color="error" onClick={() => handleDeleteContact(c)}>Excluir</Button>
@@ -163,9 +199,9 @@ export default function Contacts() {
                         label="Nome completo"
                         fullWidth
                         margin="normal"
-                        {...register('nome', { required: 'Nome é obrigatório' })}
-                        error={!!errors.nome}
-                        helperText={errors?.nome?.message}
+                        {...register('name', { required: 'Nome é obrigatório' })}
+                        error={!!errors.name}
+                        helperText={errors?.name?.message}
                     />
                     <TextField
                         label="E-mail"
@@ -179,9 +215,9 @@ export default function Contacts() {
                         label="Telefone"
                         fullWidth
                         margin="normal"
-                        {...register('telefone', { required: 'Telefone é obrigatório' })}
-                        error={!!errors.telefone}
-                        helperText={errors?.telefone?.message}
+                        {...register('phone', { required: 'Telefone é obrigatório' })}
+                        error={!!errors.phone}
+                        helperText={errors?.phone?.message}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -195,7 +231,7 @@ export default function Contacts() {
                 <DialogContent>
                     <DialogContentText>
                         <DialogContentText>
-                            Tem certeza que deseja excluir o contato "{contactToDelete?.nome}"?
+                            Tem certeza que deseja excluir o contato "{contactToDelete?.name}"?
                         </DialogContentText>
                     </DialogContentText>
                 </DialogContent>

@@ -1,9 +1,21 @@
 const Contact = require('../models/contact.model');
 
 module.exports = {
-  create: (data) => Contact.create(data),
-  findAllByClientId: (clientId) => Contact.findAll({ where: { clientId } }),
-  findById: (id) => Contact.findByPk(id),
-  update: (id, data) => Contact.update(data, { where: { id }, returning: true }),
-  delete: (id) => Contact.destroy({ where: { id } })
+    create: (data) => {
+        return Contact.create(data);
+    },
+    findAllByClientId: (clientId) => {
+        return Contact.findAll({ where: { clientId } });
+    },
+    findById: (id) => {
+        return Contact.findByPk(id);
+    },
+    update: async (id, data) => {
+        await Contact.update(data, { where: { id } });
+        const updated = await Contact.findByPk(id);
+        return updated;
+    },
+  delete: (id) => {
+        return Contact.destroy({ where: { id } });
+    },
 };

@@ -1,33 +1,45 @@
-const contacts = []; // mock temporário
+const contactService = require('../services/contact.service');
+const clientService = require('../services/client.service');
 
 module.exports = {
-  create: (req, res) => {
-    const contact = { id: Date.now(), ...req.body };
-    contacts.push(contact);
+  create: async (req, res) => {
+    const contact = await contactService.createContact(req.body);
     res.status(201).json(contact);
   },
 
-  findAll: (req, res) => {
-    res.json(contacts);
+  findAll: async (req, res) => {
+    const { clientId } = req.query;
+    if (!clientId) return res.status(400).json({ message: 'clientId é obrigatório' });
+    const contacts = await contactService.getContactsByClientId(clientId);
+    const client = await clientService.getClientById(clientId);
+    res.json({ contacts, client });
   },
 
-  findById: (req, res) => {
-    const contact = contacts.find(c => c.id === Number(req.params.id));
-    if (!contact) return res.status(404).json({ message: 'Contato não encontrado' });
-    res.json(contact);
+  findById: async (req, res) => {
+    try {
+      const contact = await contactService.getContactById(req.params.id);
+      res.json(contact);
+    } catch (err) {
+      res.status(404).json({ message: err.message });
+    }
   },
 
-  update: (req, res) => {
-    const index = contacts.findIndex(c => c.id === Number(req.params.id));
-    if (index === -1) return res.status(404).json({ message: 'Contato não encontrado' });
-    contacts[index] = { ...contacts[index], ...req.body };
-    res.json(contacts[index]);
+  update: async (req, res) => {
+    try {
+      const updated = await contactService.updateContact(req.params.id, req.body);
+      console.log(updated);
+      res.json(updated);
+    } catch (err) {
+      res.status(404).json({ message: err.message });
+    }
   },
 
-  delete: (req, res) => {
-    const index = contacts.findIndex(c => c.id === Number(req.params.id));
-    if (index === -1) return res.status(404).json({ message: 'Contato não encontrado' });
-    const deleted = contacts.splice(index, 1);
-    res.json(deleted[0]);
+  delete: async (req, res) => {
+    try {
+      const deleted = await contactService.deleteContact(req.params.id);
+      res.json(deleted);
+    } catch (err) {
+      res.status(404).json({ message: err.message });
+    }
   }
-}
+};

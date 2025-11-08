@@ -1,33 +1,48 @@
-const clients = []; // mock temporário
+const ClientService = require('../services/client.service.js');
 
 module.exports = {
-  create: (req, res) => {
-    const client = { id: Date.now(), ...req.body };
-    clients.push(client);
-    res.status(201).json(client);
+  create: async (req, res) => {
+    try {
+      const client = await ClientService.createClient(req.body);
+      res.status(201).json(client);
+    } catch (err) {
+      res.status(400).json({ message: err.message });
+    }
   },
 
-  findAll: (req, res) => {
-    res.json(clients);
+  findAll: async (req, res) => {
+    try {
+      const clients = await ClientService.getAllClients();
+      res.json(clients);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
   },
 
-  findById: (req, res) => {
-    const client = clients.find(c => c.id === Number(req.params.id));
-    if (!client) return res.status(404).json({ message: 'Cliente não encontrado' });
-    res.json(client);
+  findById: async (req, res) => {
+    try {
+      const client = await ClientService.getClientById(req.params.id);
+      res.json(client);
+    } catch (err) {
+      res.status(404).json({ message: err.message });
+    }
   },
 
-  update: (req, res) => {
-    const index = clients.findIndex(c => c.id === Number(req.params.id));
-    if (index === -1) return res.status(404).json({ message: 'Cliente não encontrado' });
-    clients[index] = { ...clients[index], ...req.body };
-    res.json(clients[index]);
+  update: async (req, res) => {
+    try {
+      const updated = await ClientService.updateClient(req.params.id, req.body);
+      res.json(updated);
+    } catch (err) {
+      res.status(404).json({ message: err.message });
+    }
   },
 
-  delete: (req, res) => {
-    const index = clients.findIndex(c => c.id === Number(req.params.id));
-    if (index === -1) return res.status(404).json({ message: 'Cliente não encontrado' });
-    const deleted = clients.splice(index, 1);
-    res.json(deleted[0]);
+  delete: async (req, res) => {
+    try {
+      const deleted = await ClientService.deleteClient(req.params.id);
+      res.json(deleted);
+    } catch (err) {
+      res.status(404).json({ message: err.message });
+    }
   }
-}
+};
