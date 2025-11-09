@@ -23,12 +23,6 @@ O projeto visa demonstrar conhecimentos em React, Node.js, Express, SQLite, alé
 
 ---
 
-## 🔐 Autenticação de Usuário
-
-- Cadastro e login de usuários
-- Senhas protegidas via bcrypt
-- Autenticação via JWT para proteger rotas do backend
-
 ## 🧰 Tecnologias Utilizadas
 
 - **Linguagem:** JavaScript (Node.js)
@@ -38,6 +32,18 @@ O projeto visa demonstrar conhecimentos em React, Node.js, Express, SQLite, alé
 - **Material-UI:** componentes de UI
 - **Recharts:** gráficos
 
+## 🔐 Middleware de Autenticação
+
+- Para proteger as rotas da API e garantir que apenas usuários autenticados acessem determinados recursos, implementamos um middleware de autenticação JWT.
+
+**Como funciona**
+
+1. Ao fazer login, o backend retorna um token JWT que expira em 1 hora.
+2. Todas as requisições a rotas protegidas devem enviar o token no cabeçalho:
+
+```bash
+Authorization: Bearer <SEU_TOKEN_AQUI>
+```
 
 ## ⚙️ Funcionalidades de Aplicação
 
@@ -56,19 +62,6 @@ O projeto visa demonstrar conhecimentos em React, Node.js, Express, SQLite, alé
 ## 📊 Dashboard
 - Gráfico de clientes cadastrados por mês
 - Cores distintas para cada mês
-
-## 🔐 Middleware de Autenticação
-
-- Para proteger as rotas da API e garantir que apenas usuários autenticados acessem determinados recursos, implementamos um middleware de autenticação JWT.
-
-**Como funciona**
-
-1. Ao fazer login, o backend retorna um token JWT que expira em 1 hora.
-2. Todas as requisições a rotas protegidas devem enviar o token no cabeçalho:
-
-```bash
-Authorization: Bearer <SEU_TOKEN_AQUI>
-```
 
 ## 💻 Executando Localmente
 
