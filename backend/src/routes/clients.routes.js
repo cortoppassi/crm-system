@@ -2,6 +2,7 @@ const express = require('express');
 const router = require('express').Router();
 const ClientController = require('../controllers/client.controller.js');
 
+router.get('/chart', ClientController.getAllClientsForChart);
 router.post('/', ClientController.create);
 router.get('/', ClientController.findAll);
 router.get('/paginated', ClientController.getAllClients);

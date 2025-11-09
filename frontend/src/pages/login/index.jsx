@@ -54,9 +54,10 @@ export default function Login() {
             <Box
                 sx={{
                     flex: 1,
-                    backgroundImage: 'url(https://picsum.photos/1200/900)',
+                    backgroundImage: 'url(https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
+                    filter: 'blur(2px)',
                 }}
             />
 

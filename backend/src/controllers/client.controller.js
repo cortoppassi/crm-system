@@ -63,5 +63,14 @@ module.exports = {
         } catch (err) {
             res.status(404).json({ message: err.message });
         }
+    },
+
+    getAllClientsForChart: async (req, res) => {
+        try {
+            const clients = await ClientService.getAllClientsForChart();
+            res.json(clients);
+        } catch (err) {
+            res.status(500).json({ message: err.message });
+        }
     }
 };

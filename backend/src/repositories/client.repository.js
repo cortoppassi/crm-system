@@ -34,5 +34,12 @@ module.exports = {
         return updated;
     },
 
+    getAllForChart: async () => {
+        return await Client.findAll({
+            attributes: ['id', 'name', 'createdAt'],
+            order: [['createdAt', 'ASC']]
+        });
+    },
+
     delete: (id) => Client.destroy({ where: { id } }),
 };
