@@ -15,17 +15,21 @@ import {
     DialogContentText,
     Pagination,
     Snackbar,
-    Alert
+    Alert,
+    LinearProgress,
+    IconButton
 } from '@mui/material'
 import AddIcon from '@mui/icons-material/Add'
+import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import SearchIcon from '@mui/icons-material/Search'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
 import { useUser } from '../../UserContext';
 
 export default function Contacts() {
     const { user } = useUser();
+    const navigate = useNavigate()
     const { clientId } = useParams()
     const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm()
     const [client, setClient] = useState(null)
@@ -39,6 +43,9 @@ export default function Contacts() {
     const [openDeleteModal, setOpenDeleteModal] = useState(false)
     const [contactToDelete, setContactToDelete] = useState(null)
     const [snack, setSnack] = useState({ open: false, message: '', severity: 'success' })
+    const [hoveredContactId, setHoveredContactId] = useState(null);
+    const [hoverProgress, setHoverProgress] = useState({});
+    const activeProgress = hoveredContactId ? hoverProgress[hoveredContactId] ?? 0 : 0;
 
     const fetchContacts = async () => {
         try {
@@ -154,7 +161,7 @@ export default function Contacts() {
                     flexDirection: 'column',
                     flex: 1,
                     gap: 2,
-                    minWidth: 0,        
+                    minWidth: 0,
                 }}
             >
                 <Paper
@@ -166,8 +173,21 @@ export default function Contacts() {
                         justifyContent: 'center',
                         minHeight: { xs: 'auto', md: 'calc(50% - 8px)' },
                         p: 3,
+                        position: 'relative',
                     }}
                 >
+                    <IconButton
+                        edge="start"
+                        color="inherit"
+                        onClick={() => navigate(-1)}
+                        sx={{
+                            position: 'absolute',
+                            top: 4,
+                            left: 16,
+                        }}
+                    >
+                        <ArrowBackIcon />
+                    </IconButton>
                     {client && (
                         <>
                             <Avatar
@@ -195,7 +215,16 @@ export default function Contacts() {
                         p: 3,
                     }}
                 >
-                    <Typography>Gráfico / Métricas do Contato</Typography>
+                    <Box display="flex" flexDirection="column" alignItems="center" width="100%">
+                        <Typography variant="subtitle2">Atividades do contato</Typography>
+                        <LinearProgress
+                            variant="determinate"
+                            value={activeProgress}
+                            sx={{ width: '100%', mt: 1 }}
+                        />
+                        <Typography variant="caption">{activeProgress}% de interações concluídas</Typography>
+                    </Box>
+
                 </Paper>
             </Box>
 
@@ -260,7 +289,18 @@ export default function Contacts() {
                                 }}
                             >
                                 {contacts.map(c => (
-                                    <Paper key={c.id} sx={{ p: 2, borderRadius: 3, textAlign: 'center', '&:hover': { boxShadow: 6 } }}>
+                                    <Paper key={c.id} sx={{ p: 2, borderRadius: 3, textAlign: 'center', '&:hover': { boxShadow: 6 } }}
+                                        onMouseEnter={() => {
+                                            const newValue = Math.floor(Math.random() * 101);
+                                            setHoverProgress(prev => ({ ...prev, [c.id]: newValue }));
+                                            setHoveredContactId(c.id); // marcar contato hover
+                                        }}
+                                        onMouseLeave={() => {
+                                            setHoverProgress(prev => ({ ...prev, [c.id]: 0 }));
+                                            setHoveredContactId(null); // remove contato hover
+                                        }}
+                                    >
+
                                         <Typography fontWeight="bold">{c.name}</Typography>
                                         <Typography color="text.secondary">{c.email}</Typography>
                                         <Typography color="text.secondary">📞 {c.phone}</Typography>
@@ -273,7 +313,6 @@ export default function Contacts() {
                             </Box>
                         </Box>
 
-                        {/* PAGINAÇÃO */}
                         <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
                             <Pagination
                                 count={totalPages}
@@ -320,7 +359,6 @@ export default function Contacts() {
                 </DialogActions>
             </Dialog>
 
-            {/* Modal de exclusão */}
             <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
                 <DialogTitle>Confirmar Exclusão</DialogTitle>
                 <DialogContent>
