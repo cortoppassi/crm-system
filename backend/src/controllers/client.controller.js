@@ -38,7 +38,7 @@ module.exports = {
         }
     },
 
-  findById: async (req, res) => {
+    findById: async (req, res) => {
         try {
             const client = await ClientService.getClientById(req.params.id);
             res.json(client);

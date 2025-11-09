@@ -2,7 +2,7 @@ const Contact = require('../models/contact.model');
 const { Op, fn, col, where } = require('sequelize')
 
 module.exports = {
-    async findAllPaginated(clientId, search, limit, offset) {
+    findAllPaginated: async (clientId, search, limit, offset) => {
         try {
             const normalizedSearch = search ? search.toLowerCase() : ''
 
@@ -35,25 +35,45 @@ module.exports = {
         }
     },
 
-    create: (data) => {
-        return Contact.create(data);
+    create: async (data) => {
+        try {
+            return await Contact.create(data);
+        } catch (error) {
+            throw new Error('Erro ao criar contato: ' + error.message);
+        }
     },
 
-    findAllByClientId: (clientId) => {
-        return Contact.findAll({ where: { clientId } });
+    findAllByClientId: async (clientId) => {
+        try {
+            return await Contact.findAll({ where: { clientId } });
+        } catch (error) {
+            throw new Error('Erro ao buscar contatos: ' + error.message);
+        }
     },
 
-    findById: (id) => {
-        return Contact.findByPk(id);
+    findById: async (id) => {
+        try {
+            return await Contact.findByPk(id);
+        } catch (error) {
+            throw new Error('Erro ao buscar contato: ' + error.message);
+        }
     },
 
     update: async (id, data) => {
-        await Contact.update(data, { where: { id } });
-        const updated = await Contact.findByPk(id);
-        return updated;
+        try {
+            await Contact.update(data, { where: { id } });
+            const updated = await Contact.findByPk(id);
+            return updated;
+        } catch (error) {
+            throw new Error('Erro ao atualizar contato: ' + error.message);
+        }
     },
 
-    delete: (id) => {
-        return Contact.destroy({ where: { id } });
+    delete: async (id) => {
+        try {
+            return await Contact.destroy({ where: { id } });
+        } catch (error) {
+            throw new Error('Erro ao deletar contato: ' + error.message);
+        }
     },
 };

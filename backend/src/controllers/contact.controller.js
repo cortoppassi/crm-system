@@ -3,19 +3,27 @@ const clientService = require('../services/client.service');
 
 module.exports = {
     create: async (req, res) => {
-        const contact = await contactService.createContact(req.body);
-        res.status(201).json(contact);
+        try {
+            const contact = await contactService.createContact(req.body);
+            res.status(201).json(contact);
+        } catch (err) {
+            res.status(400).json({ message: err.message });
+        }
     },
 
     findAll: async (req, res) => {
-        const { clientId } = req.query;
-        if (!clientId) return res.status(400).json({ message: 'clientId é obrigatório' });
-        const contacts = await contactService.getContactsByClientId(clientId);
-        const client = await clientService.getClientById(clientId);
-        res.json({ contacts, client });
+        try {
+            const { clientId } = req.query;
+            if (!clientId) return res.status(400).json({ message: 'clientId é obrigatório' });
+            const contacts = await contactService.getContactsByClientId(clientId);
+            const client = await clientService.getClientById(clientId);
+            res.json({ contacts, client });
+        } catch (err) {
+            res.status(400).json({ message: err.message });
+        }
     },
 
-    async getAllContacts(req, res) {
+    getAllContacts: async (req, res) => {
         try {
             const { clientId, page = 1, limit = 6, search = '' } = req.query
 
@@ -46,7 +54,6 @@ module.exports = {
     update: async (req, res) => {
         try {
             const updated = await contactService.updateContact(req.params.id, req.body);
-            console.log(updated);
             res.json(updated);
         } catch (err) {
             res.status(404).json({ message: err.message });
