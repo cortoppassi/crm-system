@@ -1,14 +1,14 @@
-const express = require('express');
 const router = require('express').Router();
 const ClientController = require('../controllers/client.controller.js');
+const authMiddleware = require('../middlewares/auth.middleware.js');
 
-router.get('/chart', ClientController.getAllClientsForChart);
-router.post('/', ClientController.create);
-router.get('/', ClientController.findAll);
-router.get('/paginated', ClientController.getAllClients);
-router.get('/:id', ClientController.findById);
-router.put('/:id', ClientController.update);
-router.delete('/:id', ClientController.delete);
+router.get('/chart', authMiddleware,ClientController.getAllClientsForChart);
+router.post('/', authMiddleware, ClientController.create);
+router.get('/', authMiddleware, ClientController.findAll);
+router.get('/paginated', authMiddleware, ClientController.getAllClients);
+router.get('/:id', authMiddleware, ClientController.findById);
+router.put('/:id', authMiddleware, ClientController.update);
+router.delete('/:id', authMiddleware, ClientController.delete);
 
 module.exports = {
     alias: '/clients',

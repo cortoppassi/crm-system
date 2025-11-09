@@ -1,13 +1,13 @@
-const express = require('express');
 const router = require('express').Router();
 const ContactController = require('../controllers/contact.controller.js');
+const authMiddleware = require('../middlewares/auth.middleware.js');
 
-router.post('/', ContactController.create);
-router.get('/', ContactController.findAll);
-router.get('/paginated', ContactController.getAllContacts)
-router.get('/:id', ContactController.findById);
-router.put('/:id', ContactController.update);
-router.delete('/:id', ContactController.delete);
+router.post('/', authMiddleware, ContactController.create);
+router.get('/', authMiddleware, ContactController.findAll);
+router.get('/paginated', authMiddleware, ContactController.getAllContacts)
+router.get('/:id', authMiddleware, ContactController.findById);
+router.put('/:id', authMiddleware, ContactController.update);
+router.delete('/:id', authMiddleware, ContactController.delete);
 
 module.exports = {
     alias: '/contacts',

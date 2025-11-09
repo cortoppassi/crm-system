@@ -22,11 +22,12 @@ import SearchIcon from '@mui/icons-material/Search'
 import { useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import axios from 'axios'
+import { useUser } from '../../UserContext';
 
 export default function Contacts() {
+    const { user } = useUser();
     const { clientId } = useParams()
     const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm()
-
     const [client, setClient] = useState(null)
     const [contacts, setContacts] = useState([])
     const [loading, setLoading] = useState(false)
@@ -43,7 +44,8 @@ export default function Contacts() {
         try {
             setLoading(true)
             const res = await axios.get('http://localhost:3000/contacts/paginated', {
-                params: { clientId, page, search }
+                params: { clientId, page, search },
+                headers: { Authorization: `Bearer ${user.token}` }
             })
             setContacts(res.data.contacts)
             setClient(res.data.client)
@@ -79,7 +81,9 @@ export default function Contacts() {
         if (!contactToDelete) return
         try {
             setLoading(true)
-            const res = await axios.delete(`http://localhost:3000/contacts/${contactToDelete.id}`)
+            const res = await axios.delete(`http://localhost:3000/contacts/${contactToDelete.id} `, {
+                headers: { Authorization: `Bearer ${user.token}` }
+            })
             if (res.status === 200) {
                 setContacts(contacts.filter(c => c.id !== contactToDelete.id))
             } else {
@@ -99,12 +103,16 @@ export default function Contacts() {
         try {
             setLoading(true)
             if (editingContact) {
-                const res = await axios.put(`http://localhost:3000/contacts/${editingContact.id}`, data)
+                const res = await axios.put(`http://localhost:3000/contacts/${editingContact.id}`, data, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                })
                 if (res.status === 200) {
                     setContacts(contacts.map(c => (c.id === editingContact.id ? res.data : c)))
                 }
             } else {
-                const res = await axios.post(`http://localhost:3000/contacts`, { clientId: Number(clientId), ...data })
+                const res = await axios.post(`http://localhost:3000/contacts`, { clientId: Number(clientId), ...data }, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                })
                 if (res.status === 201) {
                     setContacts([...contacts, res.data])
                 }

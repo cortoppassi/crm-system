@@ -53,9 +53,10 @@ export default function Clients() {
 
     const fetchClients = async () => {
         setLoading(true);
-
+        
         try {
             const res = await axios.get('http://localhost:3000/clients/paginated', {
+                headers: { Authorization: `Bearer ${user.token}` },
                 params: {
                     page,
                     search
@@ -102,7 +103,9 @@ export default function Clients() {
 
         try {
             setLoading(true);
-            await axios.delete(`http://localhost:3000/clients/${clientToDelete.id}`);
+            await axios.delete(`http://localhost:3000/clients/${clientToDelete.id}`, {
+                headers: { Authorization: `Bearer ${user.token}` }
+            });
 
             setClients(clients.filter(c => c.id !== clientToDelete.id));
         } catch (err) {
@@ -124,11 +127,15 @@ export default function Clients() {
         try {
             setLoading(true)
             if (editingClient) {
-                const res = await axios.put(`http://localhost:3000/clients/${editingClient.id}`, data)
+                const res = await axios.put(`http://localhost:3000/clients/${editingClient.id}`, data, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
                 setClients(clients.map(c => c.id === res.data.id ? res.data : c))
                 setSnack({ open: true, message: 'Cliente atualizado com sucesso!', severity: 'success' })
             } else {
-                const res = await axios.post('http://localhost:3000/clients', data)
+                const res = await axios.post('http://localhost:3000/clients', data, {
+                    headers: { Authorization: `Bearer ${user.token}` }
+                });
                 setClients([...clients, res.data])
                 setSnack({ open: true, message: 'Cliente cadastrado com sucesso!', severity: 'success' })
             }
