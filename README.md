@@ -98,23 +98,6 @@ cd frontend
 npm install
 npm run dev       # Inicia frontend em http://localhost:5173
 ```
-3. Execute as migrations no backend:
-- Para fins de teste, existe uma migration que cadastra ✅ 50 clientes e ✅ 200 contatos automaticamente.
-```bash
-npm run migrate
-```
-
-4. Inicie o servidor e o frontend:
-
-```bash
-npm run dev
-```
-
-- A API estará disponível em:
-
-```bash
-[npm run dev](http://localhost:3000)
-```
 
 ## 🧱 Estrutura do Projeto
 
