@@ -8,28 +8,36 @@
 
 ---
 
-## 📝 Descrição
+## 📝 Descrição do Projeto
 
-Sistema de gerenciamento de clientes e contatos com dashboard de métricas.  
+Sistema de gerenciamento de clientes e contatos, desenvolvido para avaliação de competências Fullstack.
 
-Permite cadastrar, editar e remover clientes, visualizar contatos vinculados, e acompanhar a quantidade de clientes cadastrados por mês em gráficos.  
+**Funcionalidades principais:**
 
-Frontend desenvolvido em **React** com **Material-UI** e **Recharts**.  
+- CRUD de clientes e contatos vinculados 
+- Dashboard com gráficos de cadastro de clientes por mês
+- Visualização detalhada de clientes e seus contatos
+- Autenticação básica com e-mail e senha (JWT)
 
-Backend em **Node.js**, **Express** e **Sequelize** com **SQLite**.
+O projeto visa demonstrar conhecimentos em React, Node.js, Express, SQLite, além de boas práticas em MVC, Service/Repository e organização de código.
 
 ---
 
 ## 🔐 Autenticação de Usuário
-- O sistema possui autenticação básica de usuários usando e-mail e senha, com proteção de senha via bcrypt e geração de **JWT (JSON Web Token)
+
+- Cadastro e login de usuários
+- Senhas protegidas via bcrypt
+- Autenticação via JWT para proteger rotas do backend
 
 ## 🧰 Tecnologias Utilizadas
 
 - **Linguagem:** JavaScript (Node.js)
-- **Framework:** Express.js
-- **Banco de Dados:** SQLite
-- **ORM:** Sequelize
-- **Outros:** axios, express, bcrypt, jsonwebtoken...
+- **axios:** requisições HTTP
+- **bcrypt:** hash de senhas
+- **jsonwebtoken:** autenticação via JWT
+- **Material-UI:** componentes de UI
+- **Recharts:** gráficos
+
 
 ## ⚙️ Funcionalidades de Aplicação
 
@@ -38,22 +46,23 @@ Backend em **Node.js**, **Express** e **Sequelize** com **SQLite**.
 - Visualização de contatos ao clicar no cliente  
 - Paginação e busca por nome/email
 
+## 🗂️ Contatos
+- Cadastro, edição, listagem e exclusão (CRUD)  
+- Vinculação a clientes existentes
+- Paginação e busca por nome/email
+
 ## 📊 Dashboard
 - Gráfico de clientes cadastrados por mês
 - Cores distintas para cada mês
-- Tooltip explicativo nos cards
-
-## 🗂️ Contatos
-- Vinculados a clientes
-- CRUD básico
-- Para fins de teste, existe uma migration que cadastra ✅ 50 clientes e ✅ 200 contatos automaticamente.
 
 ## 💻 Executando Localmente
 
 ### 🔧 Pré-requisitos
 
-- Node.js (v18 ou superior)
-- npm (v9 ou superior)
+- Git (para clonar o repositório)
+- Node.js v18 ou superior
+- npm v9 ou superior
+- Navegador moderno (Chrome, Firefox, Edge)
 
 ### 🔨 Instalação
 
@@ -71,15 +80,18 @@ cd crm-system
 ```bash
 cd backend
 npm install
+npm run migrate   # Popula DB com 50 clientes e 200 contatos
+npm run dev       # Inicia backend em http://localhost:3001
 ```
 - No segundo terminal, entre na pasta do frontend:
 
 ```bash
 cd frontend
 npm install
+npm run dev       # Inicia frontend em http://localhost:5173
 ```
 3. Execute as migrations no backend:
-
+- Para fins de teste, existe uma migration que cadastra ✅ 50 clientes e ✅ 200 contatos automaticamente.
 ```bash
 npm run migrate
 ```
@@ -99,27 +111,39 @@ npm run dev
 ## 🧱 Estrutura do Projeto
 
 ```
-/codigo-fonte
-├── report-engine/
+/CRM-SYSTEM
+├── backend/                       # Backend da aplicação
 │   ├── src/
-│   │   ├── controllers/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   ├── repositories/
-│   │   ├── models/
-│   │   ├── migrations/
-│   │   └── config/
+│   │   ├── config/                # Configurações gerais (DB, JWT, variáveis)
+│   │   ├── controllers/           # Lógica das rotas (HTTP requests)
+│   │   ├── database/              # Conexão e inicialização do DB
+│   │   ├── models/                # Modelos do Sequelize
+│   │   ├── repositories/          # Acesso direto ao banco e queries
+│   │   ├── routes/                # Definição das rotas da API
+│   │   └── services/              # Regras de negócio
+│   ├── migrations/                # Migrations do banco de dados
 │   ├── package.json
-│   └── ... (outros arquivos da aplicação principal)
-├── store-manager/
+│   └── server.js                  # Entry point do backend
+├── frontend/                      # Frontend da aplicação
+│   ├── public/                    # Assets públicos (imagens, favicon)
 │   ├── src/
-│   │   ├── controllers/
-│   │   ├── routes/
-│   │   ├── services/
-│   │   └── repositories/
+│   │   ├── api/                   # Requisições HTTP e configuração do axios
+│   │   ├── assets/                # Imagens, ícones, fontes
+│   │   ├── components/            # Componentes reutilizáveis
+│   │   ├── hooks/                 # Custom hooks
+│   │   ├── pages/                 # Páginas da aplicação
+│   │   ├── routes/                # Configuração das rotas frontend
+│   │   ├── styles/                # Arquivos CSS e estilos globais
+│   │   ├── App.jsx
+│   │   ├── App.css
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   └── UserContext.jsx        # Context API para gerenciamento de estado global
 │   ├── package.json
-│   └── ... (outros arquivos da aplicação de relatórios)
-└── docker-compose.yml
+│   └── vite.config.js
+└── README.md
+
+
 ```
 
 ## 🔧 Organização das Pastas e Arquitetura
@@ -133,9 +157,20 @@ npm run dev
 | routes/         | Organização das rotas da API (Express)         |
 | database/       | Configurações do Sequelize                     |
 
-## 🏗️ Arquitetura e Estratégia
+## 🏗️ Observações sobre a arquitetura
 
-- Arquitetura baseada em **MVC (Model-View-Controller) + Service + Repository**
-- Estrutura modular dentro de uma aplicação monolítica
-- Comunicação via APIs REST / API RESTful
-- Banco de dados relacional compartilhado (SQLite)
+**Backend**
+
+- Estrutura modular seguindo MVC + Service + Repository
+- database/ é usado para centralizar a inicialização do Sequelize e conexão com SQLite
+- config/ armazena variáveis e configuração de JWT, DB e outros
+
+**Frontend**
+
+- Estrutura clara separando componentes, páginas, hooks e API
+- UserContext.jsx centraliza autenticação e estado global do usuário
+- routes/ define navegação da aplicação
+
+## 📄 Licença
+Este projeto está licenciado sob a MIT License.
+
