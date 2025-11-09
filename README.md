@@ -20,6 +20,9 @@ Backend em **Node.js**, **Express** e **Sequelize** com **SQLite**.
 
 ---
 
+## 🔐 Autenticação de Usuário
+- O sistema possui autenticação básica de usuários usando e-mail e senha, com proteção de senha via bcrypt e geração de **JWT (JSON Web Token)
+
 ## 🧰 Tecnologias Utilizadas
 
 - **Linguagem:** JavaScript (Node.js)
