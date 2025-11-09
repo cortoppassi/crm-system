@@ -138,6 +138,16 @@ npm run dev       # Inicia frontend em http://localhost:5173
 
 ```
 
+## 🗄️ Estrutura e Relacionamento das Tabelas
+**O sistema possui três tabelas principais: User, Client e Contact.**
+
+| Tabela        | Descrição                              | Relacionamento                           |
+|---------------|----------------------------------------|------------------------------------------|
+| User          | Armazena e-mails e senhas de usuários  | Nenhum relacionamento com outras tabelas |
+| Client        | Armazena informações dos clientes      | Um-para-muitos com Contact               |
+| Contact       | Armazena informações de contatos       | Pertence a um único Client (clientId)    |
+
+
 ## 🔧 Organização das Pastas e Arquitetura
 
 | Camada          | Função                                         |
