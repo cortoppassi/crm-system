@@ -53,7 +53,7 @@ export default function Clients() {
 
     const fetchClients = async () => {
         setLoading(true);
-        
+
         try {
             const res = await axios.get('http://localhost:3000/clients/paginated', {
                 headers: { Authorization: `Bearer ${user.token}` },
@@ -164,6 +164,11 @@ export default function Clients() {
         setValue('phone', client.phone)
     }
 
+    const handleLogout = () => {
+        localStorage.removeItem('token')
+        navigate('/')
+    }
+
     useEffect(() => {
         fetchClients()
     }, [page, search])
@@ -211,38 +216,70 @@ export default function Clients() {
                         flex: 1,
                         display: 'flex',
                         flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
                         minHeight: { xs: '100%', md: 'calc(50% - 8px)' },
                         p: 3,
                     }}
                 >
-                    <Box sx={{ position: 'relative', mb: 2 }}>
-                        <Avatar
-                            alt="Avatar padrão"
-                            src="https://i.pravatar.cc/150?img=2"
-                            sx={{ width: 100, height: 100 }}
-                        />
-                        <IconButton
-                            size="small"
+                    <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <Box sx={{ position: 'relative', mb: 2 }}>
+                            <Avatar
+                                alt="Avatar padrão"
+                                src="https://i.pravatar.cc/150?img=2"
+                                sx={{ width: 100, height: 100 }}
+                            />
+                            <IconButton
+                                size="small"
+                                sx={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    right: 0,
+                                    bgcolor: 'white',
+                                    border: '1px solid #ccc',
+                                    '&:hover': { bgcolor: '#f0f0f0' },
+                                }}
+                            >
+                                <AddPhotoAlternateIcon fontSize="small" color="action" />
+                            </IconButton>
+                        </Box>
+
+                        <Typography variant="h6" fontWeight="bold">
+                            {user?.user?.email}
+                        </Typography>
+                    </Box>
+
+                    <Box mt={3} display="flex" flexDirection={{ xs: 'column', md: 'row' }} gap={1} width="100%">
+                        <Button
+                            variant="outlined"
+                            fullWidth
                             sx={{
-                                position: 'absolute',
-                                bottom: 0,
-                                right: 0,
-                                bgcolor: 'white',
-                                border: '1px solid #ccc',
-                                '&:hover': { bgcolor: '#f0f0f0' },
+                                height: 30,
+                                minHeight: 'unset',
+                                padding: '4px 8px',
+                                fontSize: '0.875rem'
                             }}
+                            onClick={() => setSnack({ open: true, message: 'Em desenvolvimento.', severity: 'error' })}
                         >
-                            <AddPhotoAlternateIcon fontSize="small" color="action" />
-                        </IconButton>
+                            Alterar senha
+                        </Button>
+                        <Button
+                            variant="outlined"
+                            fullWidth
+                            color="error"
+                            sx={{
+                                height: 30,
+                                minHeight: 'unset',
+                                padding: '4px 8px',
+                                fontSize: '0.875rem'
+                            }}
+                            onClick={handleLogout}
+                        >
+                            Sair da conta
+                        </Button>
                     </Box>
 
 
-                    <Typography variant="h6" fontWeight="bold">
-                        {user?.user?.email}
-                    </Typography>
                 </Paper>
+
                 <Paper
                     sx={{
                         flex: 1,
