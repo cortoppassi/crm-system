@@ -42,15 +42,17 @@ O projeto visa demonstrar conhecimentos em React, Node.js, Express, SQLite, alé
 ## ⚙️ Funcionalidades de Aplicação
 
 ## 📁 Clientes
-- Cadastro, edição, listagem e exclusão (CRUD)  
+- CRUD completo: cadastro, edição, listagem e exclusão
 - Visualização de contatos ao clicar no cliente  
-- Paginação e busca por nome/email
-
+- Paginação e busca filtrada sob demanda: carrega apenas os registros necessários, garantindo performance e escalabilidade
+- Todos os formulários possuem validação de campos obrigatórios
+  
 ## 🗂️ Contatos
-- Cadastro, edição, listagem e exclusão (CRUD)  
+- CRUD completo: cadastro, edição, listagem e exclusão
 - Vinculação a clientes existentes
-- Paginação e busca por nome/email
-
+- Paginação e busca filtrada sob demanda: mantém a aplicação responsiva mesmo com grande volume de dados
+- Validação de formulários: campos obrigatórios e padrões de entrada validados em tempo real
+  
 ## 📊 Dashboard
 - Gráfico de clientes cadastrados por mês
 - Cores distintas para cada mês
