@@ -139,7 +139,7 @@ npm run dev       # Inicia frontend em http://localhost:5173
 ```
 
 ## 🗄️ Estrutura e Relacionamento das Tabelas
-**OO sistema possui três tabelas principais: User, Client e Contact.**
+**O sistema possui três tabelas principais: User, Client e Contact.**
 
 | Tabela        | Descrição                              | Relacionamento                           |
 |---------------|----------------------------------------|------------------------------------------|
