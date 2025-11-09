@@ -73,7 +73,6 @@ export default function Clients() {
         }
     };
 
-
     const getClientsPerMonth = (clients) => {
         const counts = {};
 
@@ -176,7 +175,6 @@ export default function Clients() {
             reset()
         }
     }, [editingClient, setValue, reset])
-
 
     return (
         <Box

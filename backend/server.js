@@ -19,7 +19,7 @@ routesController(app)
 const PORT = 3000
 
 sequelize
-  .sync({ alter: true })
+  .sync()
   .then(() => {
     console.log('Banco SQLite sincronizado ✅')
     app.listen(PORT, () => {

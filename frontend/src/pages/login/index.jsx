@@ -50,11 +50,11 @@ export default function Login() {
     }
 
     return (
-        <Box sx={{ display: 'flex', height: '100vh' }}>
+        <Box sx={{ display: 'flex', height: '100vh', flexDirection: { xs: 'column', md: 'row' } }}>
             <Box
                 sx={{
                     flex: 1,
-                    backgroundImage: 'url(https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg)',
+                    backgroundImage: 'url(/login-background.jpeg)',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                     filter: 'blur(2px)',
