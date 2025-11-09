@@ -174,6 +174,18 @@ npm run dev       # Inicia frontend em http://localhost:5173
 - UserContext.jsx centraliza autenticação e estado global do usuário
 - routes/ define navegação da aplicação
 
+## 💡 Notas do Desenvolvedor
+
+- Por se tratar de um projeto relativamente simples, optei por não utilizar Docker nem bancos de dados mais robustos, mantendo leve e fácil de executar localmente.
+
+- A estilização foi feita com componentes prontos do Material UI, garantindo consistência visual e rapidez no desenvolvimento.
+
+- Segui uma arquitetura modular baseada em MVC + Service + Repository, aplicando princípios do SOLID, o que torna o código mais manutenível e escalável.
+
+- Escolhi bibliotecas robustas e funcionais, como React Hook Form para gerenciamento de formulários, facilitando validações e integração com UI.
+
+- Todas as decisões foram guiadas pelo equilíbrio entre simplicidade, performance e boas práticas, priorizando clareza e qualidade do código.
+
 ## 📄 Licença
 Este projeto está licenciado sob a MIT License.
 
