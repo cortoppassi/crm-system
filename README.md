@@ -57,6 +57,19 @@ O projeto visa demonstrar conhecimentos em React, Node.js, Express, SQLite, alé
 - Gráfico de clientes cadastrados por mês
 - Cores distintas para cada mês
 
+## 🔐 Middleware de Autenticação
+
+- Para proteger as rotas da API e garantir que apenas usuários autenticados acessem determinados recursos, implementamos um middleware de autenticação JWT.
+
+**Como funciona**
+
+1. Ao fazer login, o backend retorna um token JWT que expira em 1 hora.
+2. Todas as requisições a rotas protegidas devem enviar o token no cabeçalho:
+
+```bash
+Authorization: Bearer <SEU_TOKEN_AQUI>
+```
+
 ## 💻 Executando Localmente
 
 ### 🔧 Pré-requisitos
@@ -117,6 +130,7 @@ npm run dev
 ├── backend/                       # Backend da aplicação
 │   ├── src/
 │   │   ├── config/                # Configurações gerais (DB, JWT, variáveis)
+├   |   |── middlewares/           # Middleware de autenticação JWT
 │   │   ├── controllers/           # Lógica das rotas (HTTP requests)
 │   │   ├── database/              # Conexão e inicialização do DB
 │   │   ├── models/                # Modelos do Sequelize
@@ -156,6 +170,7 @@ npm run dev
 | repositories/   | Consultas e acesso direto ao banco             |
 | services/       | Regras de negócio e validações                 |
 | controllers/    | Manipulação de requisições HTTP                |
+| middlewares/    | Autenticação intermediaria antes do controller |
 | routes/         | Organização das rotas da API (Express)         |
 | database/       | Configurações do Sequelize                     |
 
